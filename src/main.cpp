@@ -1,4 +1,6 @@
-
+// TO DO BEFORE TESTING
+// Have to tune the robot with the margins and maxstep, as specified on etl
+// Test this on the real world map given
 //state definition
 #define INIT 0
 #define RUNNING 1
@@ -93,11 +95,17 @@ int main(int argc, char** argv){
     printf("map.rows = %d\n", map.rows);
     map_origin_x = map_x_range/2.0 - 0.5;
     map_origin_y = map_y_range/2.0 - 0.5;
+    /* //Testing implementation
     world_x_min = -10.0;
     world_x_max = 10.0;
     world_y_min = -10.0;
-    world_y_max = 10.0;
-    res = 0.05;
+    world_y_max = 10.0;*/
+    //Real world implementation
+    world_x_min = -1.0;
+    world_x_max = 2.0;
+    world_y_min = -2.0;
+    world_y_max = 2.0; 
+    res = 0.01; //0.05 //0.01 Latter for real world
     printf("Load map\n");
     dynamic_map = map.clone();
 
@@ -375,10 +383,10 @@ void generate_path_RRT()
     rrtTree tree;
 
     int i=0;
-    while (i < 3) //Basically order_size - 1, have to change this one everytime i change the waypoints
+    while (i < 2) //Basically order_size - 1, have to change this one everytime i change the waypoints
     {
-        tree = rrtTree(waypoints[i], waypoints[i+1], map, map_origin_x, map_origin_y, res, 8); //last one is margin to wall
-        tree.generateRRTst(world_x_max, world_x_min, world_y_max, world_y_min, 2000, 3); //K = 500, MAX_STEP = 1
+        tree = rrtTree(waypoints[i], waypoints[i+1], map, map_origin_x, map_origin_y, res, 3); //last one is margin to wall , testing is 8
+        tree.generateRRTst(world_x_max, world_x_min, world_y_max, world_y_min, 2000, 1); //K = 500, MAX_STEP = 1, testing is 3
 
         result = tree.backtracking();
         std::reverse(result.begin(),result.end());
@@ -389,8 +397,9 @@ void generate_path_RRT()
         BALLOONS[i] = result.size();
         i++;
     }
-    tree = rrtTree(waypoints[0], waypoints[0+1], map, map_origin_x, map_origin_y, res, 8); //last one is margin to wall
-    tree.generateRRTst(world_x_max, world_x_min, world_y_max, world_y_min, 2000, 3); //K = 500, MAX_STEP = 1
+
+    tree = rrtTree(waypoints[0], waypoints[0+1], map, map_origin_x, map_origin_y, res, 3); //last one is margin to wall
+    tree.generateRRTst(world_x_max, world_x_min, world_y_max, world_y_min, 2000, 1); //K = 500, MAX_STEP = 1
 
     result = tree.backtracking();
 }
@@ -410,8 +419,8 @@ void generate_path_RRT_update(int start){  // Updating the path after a crash
 
     while (start < 3) //order_size - 1
     {
-        tree = rrtTree(waypoints[start], waypoints[start+1], dynamic_map, map_origin_x, map_origin_y, res, 5); //last one is margin to wall
-        tree.generateRRTst(world_x_max, world_x_min, world_y_max, world_y_min, 2000, 3);
+        tree = rrtTree(waypoints[start], waypoints[start+1], dynamic_map, map_origin_x, map_origin_y, res, 2); //last one is margin to wall, testing is 5
+        tree.generateRRTst(world_x_max, world_x_min, world_y_max, world_y_min, 2000, 1); //Testing is 3
         result = tree.backtracking();
         std::reverse(result.begin(),result.end());
 
@@ -430,8 +439,8 @@ void generate_path_RRT_update(int start){  // Updating the path after a crash
         }
         printf("start = %d\n", start);
     }
-    tree = rrtTree(waypoints[old_start], waypoints[old_start+1], dynamic_map, map_origin_x, map_origin_y, res, 5); //last one is margin to wall
-    tree.generateRRTst(world_x_max, world_x_min, world_y_max, world_y_min, 2000, 3);
+    tree = rrtTree(waypoints[old_start], waypoints[old_start+1], dynamic_map, map_origin_x, map_origin_y, res, 2); //last one is margin to wall
+    tree.generateRRTst(world_x_max, world_x_min, world_y_max, world_y_min, 2000, 1);
     result = tree.backtracking();
 }
 
@@ -439,6 +448,16 @@ void generate_path_RRT_update(int start){  // Updating the path after a crash
 
 void set_waypoints()
 {
+
+	//For the real world
+	waypoint_candid[0].x = 1.5;
+	waypoint_candid[0].y = -1.5;
+	waypoint_candid[1].x = 1.5;
+	waypoint_candid[1].y = 1.5;
+	waypoint_candid[2].x = -0.5;
+	waypoint_candid[2].y = -1.5;
+	int order [] = {0, 1, 2};
+	int order_size = 3;
     /*// scenario 1 sample way points
     point waypoint_candid[3];
     waypoint_candid[0].x = -6.0;
@@ -461,7 +480,7 @@ void set_waypoints()
     int order[] = {0,1,2};
     int order_size = 3;*/
 
-    // scenario 3 sample way points
+    /*// scenario 3 sample way points
     point waypoint_candid[4];
     waypoint_candid[0].x = 5.0;
     waypoint_candid[0].y = -7.0;
@@ -472,7 +491,7 @@ void set_waypoints()
     waypoint_candid[3].x = 8.0;
     waypoint_candid[3].y = 8.0;
     int order[] = {0,1,2,3};
-    int order_size = 4;
+    int order_size = 4;*/
 
 
 
